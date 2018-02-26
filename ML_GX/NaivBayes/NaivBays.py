@@ -1,7 +1,7 @@
 
 # 使用朴素贝叶斯方法判断敏感文字
 
-from numpy import *
+# from numpy import *
 
 def loadDataset():
     postingList=[['my', 'dog', 'has', 'flea', 'problems', 'help', 'please'],
@@ -16,19 +16,18 @@ def loadDataset():
 # 创建一个字典，根据标签存储单词
 
 def volList(dictList, listLabel):
-    abuseWords = []                                 # abuseWords 就是打了标签1的Vocabulary，根据标签分类
-    normalWords = []                                # normalWords 就是打了标签0的Vocabulary，根据标签分类
     abuseDict = {}
     normalDict = {}
 
     labels = listLabel
     for i in range(len(labels)):
         if labels[i] == 1:
-            abuseWords = abuseWords | dictList[i]   # 先把abuse words提取出来形成一个set
-        else:
-            normalWords = normalWords | dictList[i] # 再把normal words提取出来形成一个set
-    abuseDict[abuseWords] = abuseDict.get(abuseWords, 0) + 1             # 再把set里的元素累加到Dict里并计数
-    normalDict[normalWords] = normalDict.get(normalWords, 0) + 1             # 再把set里的元素累加到Dict里并计数
+            for j in range(len(dictList[i])):
+                abuseDict[dictList[i][j]] = abuseDict.get(dictList[i][j], 0) + 1 # 把abusive words录入一个字典并统计每个单词出现的次数
+        elif labels[i] == 0:
+            for j in range(len(dictList[i])):
+                normalDict[dictList[i][j]] = normalDict.get(dictList[i][j], 0) + 1 # 把normal words录入一个字典并统计每个单词出现的次数
+
     return abuseDict, normalDict
 
 def pInput(numInput, numTotal):             # 输入词占整体比率
@@ -37,29 +36,35 @@ def pInput(numInput, numTotal):             # 输入词占整体比率
 def pAbuse(numAbuse, numTotal):             # 敏感词占整体比率
     return float(numAbuse/numTotal)
 
-def pInputOnAbuse(numInput, numAbuse):      # 条件概率P（Input|Abuse）
-    return float(numInput/numAbuse)
-
-def NaivBayes():                            # 计算P(Abuse|Input) = P(Input|Abuse)P(Abuse)/P(Input) 和 P(Normal|Input)
+# 计算条件概率P（Input|Condition）就是统计testDataset里面的词出现在conditionDict字典里的次数
+def pInputOnCondition(testDataset, conditionDict):
+    num = 0
+    m = len(testDataset)
+    for i in range(m):
+        num = conditionDict.get(testDataset[i], 0) + 1
+    num /=sum(conditionDict.values())
+    return num
+# 计算P(Abuse|Input) = P(Input|Abuse)P(Abuse)/P(Input) 和 P(Normal|Input)
+def NaivBayes():
     testDataset = ['my', 'love', 'dalmation']
     postingList, classVec = loadDataset()
     abuDict, norDict = volList(postingList, classVec)
 
     numInput = len(testDataset)
-    numTotal = len(postingList)
-    numAbuse = len(abuDict)
-    numNormal = len(norDict)
+    numAbuse = sum(int(i) for i in abuDict.values())
+    numNormal = sum(int(i) for i in norDict.values())
+    numTotal = numAbuse + numNormal
 
-    pAI = pInputOnAbuse(numInput, numAbuse) * pAbuse(numAbuse, numTotal) / pInput(numInput, numTotal)
-    pNI = pInputOnAbuse(numInput, numNormal) * pAbuse(numAbuse, numTotal) / pInput(numInput, numTotal)
+    pAI = pInputOnCondition(testDataset, abuDict) * pAbuse(numAbuse, numTotal)
+    pNI = pInputOnCondition(testDataset, norDict) * pAbuse(numNormal, numTotal)
 
     if pAI > pNI:
         print("We predict the words %s is ABUSED." % testDataset)
     else:
         print("We predict the words %s is normal." % testDataset)
     return 0
-
-NaivBayes()
+if __name__ == '__main__':
+    NaivBayes()
 
 
 
