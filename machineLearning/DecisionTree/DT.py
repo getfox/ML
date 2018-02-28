@@ -94,8 +94,7 @@ class DecitionTree():
             if vote not in labelCount.keys(): 
                 labelCount[vote] = 0
             labelCount[vote] += 1
-        sortedClassCount = sorted(labelCount.iteritems(), key=lambda x:x[1], \
-                                     reverse=True)
+        sortedClassCount = sorted(labelCount.items(), key=lambda x:x[1], reverse=True)
         return sortedClassCount[0][0]
 
     def _createTree(self, X, y, featureIndex):
@@ -175,7 +174,7 @@ class DecitionTree():
             result = []
             for i in range(X.shape[0]):
                 value = self._classify(self._tree, X[i])
-                print str(i+1)+"-th sample is classfied as:", value 
+                print (str(i+1)+"-th sample is classfied as:", value)
                 result.append(value)
             return np.array(result)
 
