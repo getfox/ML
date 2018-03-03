@@ -35,7 +35,7 @@ def radix_sort(L):
             count[i] += count[i - 1]
         for x in range(len(L)-1, -1, -1):
             j = get_pos(L[x], pos)
-            bucket[count[j]-1] = L[x]
+            bucket[ count[j] -1 ] = L[x]
             count[j] = count[j]-1
         for x in range(0, len(L)):
             L[x] = bucket[x]
