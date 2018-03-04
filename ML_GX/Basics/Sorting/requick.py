@@ -8,6 +8,7 @@
 def quick_sort(L, start, end):
 
     if start < end:
+
         i, j, pivot = start, end, L[start]
         while i<j:
             while (i<j) and L[j] > pivot:
