@@ -40,7 +40,6 @@ def radix_sort(L):
         for x in range(0, len(L)):
             L[x] = bucket[x]
 
-
 L = [9, 1, 22, 56, 37, 114, 238, 186, 833, 15, 336, 116]
 radix_sort(L)
 print("radix_sort:", L)
